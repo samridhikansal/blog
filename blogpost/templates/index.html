@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+  {% block content %}
+ 
+  {% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-success mt-2" role="alert">{{message}}</div>
+    {% endfor%}
+  {% endif %}
+    <div class="col-lg-11">
+                    <!-- Post content-->
+                    
+                     {% for post in page_obj %}
+                     
+                     <article>
+                        <!-- Post header-->
+                        <header class="mb-4">
+                           
+                            <!-- Post title-->
+                            <h1 class="fw-bolder mb-1">{{post.name}}</h1>
+                            <!-- Post meta content-->
+                             {% for user in users %}
+                                {% if user.id == post.author_id %}
+                            <div class="text-muted fst-italic mb-2">Posted by {{user.username}}</div>
+                                {% endif %}
+                            {% endfor %}
+                            <!-- Post categories--> 
+                             {% for category in categories %}
+                                {% if category.id == post.category_id %}
+                            <a class="badge bg-secondary text-decoration-none link-light" href="#!">Category: {{category.category}}</a>
+                            <a class="badge bg-secondary text-decoration-none link-light" href="{% url 'post' id=post.id %}">Details</a>
+                                {% endif %}
+                             {% endfor %}
+                        </header>
+                        <!-- Preview image figure-->
+                        <figure class="mb-4"><img class="img-fluid rounded" src="{{ 'post.image' }}" alt={{post.image}} /></figure>
+                        <!-- Post content-->
+                    </article>
+                    {% endfor %}
+                    
+                     {% block pagination %}
+                     <div class=" d-flex flex-row justify-content-between mb-2">
+                        <div>
+                            {% for page_number in page_obj.paginator.page_range %}
+                            <a href="{% url 'index' page_number %}" class="{% if page_number == page_obj.number %}current{% endif %} mx-1">
+                                {{page_number}}</a>
+                               {%endfor%}
+                        </div>
+                        <div> {{page_obj}} </div>
+                     </div>
+                       
+                    {% endblock %}
+                    
+                    
+                    
+                    
+                    
+    </div>          
+    {% endblock %}
+                 

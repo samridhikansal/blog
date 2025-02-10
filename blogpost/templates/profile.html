@@ -1,0 +1,51 @@
+{% include 'navbar.html' %}
+
+
+
+<div class="container mt-2">
+    <!-- This section displays all the posts written by the user -->
+     {% for mesaage in messages%}
+     <div class={{message.tag}}>{{message}}</div>
+     {%endfor%}
+    <section class="mt-2">
+        {%if user.post%}
+        <div>I am here</div>
+        {%endif%}
+        {% if posts %}
+             <h2> You have posts the following on the portal</h2>
+            {% for post in posts%}
+            <p>{{post.name}}</p>
+            
+            <button><a href=" {% url 'edit_post' id=post.id %}" >Edit</a></button>
+            <button>Delete</button>
+            {%endfor%}
+        {% else %}
+            <h2>No Posts to show</h2>
+            {{post}}
+            {{comment}}
+        {% endif %}
+    </section>
+    <!-- This section contains all the comments made by the user -->
+    <section>
+        {% if comments %}
+        <h2> You have commented on the following posts </h2>
+            {% for comment in comments %}
+                <div>
+                    <h3>{{comment.post}}</h3>
+                    <p> {{comment.comment}}</p>
+                    <div class="d-flex flex-row justify-content-center">
+                        <button class="btn btn-secondary mx-2"><a href="{% url 'edit_comments'  comment_id=comment.id%}"> Edit Comment</a></button>
+                        <button class="btn btn-secondary mx-2">Delete Comment</button>
+                    </div>
+                </div>
+            {% endfor %}
+        {%endif%}
+    </section>
+<div class="d-flex justify-content-between">
+    <a href = "{% url 'add' %}">Add a new Post</a>
+    
+</div>
+
+</div>
+
+
