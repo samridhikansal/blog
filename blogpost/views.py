@@ -8,6 +8,7 @@ from .forms import PostForm , CategoryForm, CommentsForm
 from .models import PostCategory, Post, Comments
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger, Page
 from django.views.generic.list import ListView
+from django.core.exceptions import ObjectDoesNotExist
 
 
 # Create your views here.
@@ -20,12 +21,19 @@ def index(request, page):
     page_object =paginator.get_page(page)
     categories = PostCategory.objects.all().values()
     users = User.objects.all().values()
-    return render( request, "index.html", {"posts": posts, "categories": categories, "users": users, "page_obj":page_object})
+    return render( request, "index.html", {"posts": posts,  "users": users, "page_obj":page_object})
 
 #display posts sorted by categories
 
 def category(request, name):
-    return render(request, "category.html")
+    try:
+        category = PostCategory.objects.get(category = name)
+        if category:
+          posts = Post.objects.filter(category= category)
+          return render(request, "category.html", {"posts": posts, "category": category.category})
+    except ObjectDoesNotExist:
+        messages.error(request, "there is some error")
+        return redirect('index')
 
 #post detail page. The comments form is also on this page. All the prvious comments are also rendered on this page 
 def post(request, id):

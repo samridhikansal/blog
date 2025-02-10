@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from datetime import datetime
+from datetime import datetime, date
 
 # Create your models here.
 
@@ -16,6 +16,7 @@ class Post(models.Model):
     image = models.ImageField(upload_to= "image/", blank=True , default= "cow.jpg")
     author = models.ForeignKey(User, on_delete= models.CASCADE)
     category = models.ForeignKey(PostCategory, on_delete=models.CASCADE, null=True, blank= True)
+    time = models.DateField(default=datetime.now(), null=True, blank=True)
    
 
     def __str__(self):

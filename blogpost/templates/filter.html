@@ -26,7 +26,13 @@
           Filter Posts
         </button>
         <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-          <li><a class="dropdown-item" href="#">By Category</a></li>
+          
+            
+              {% for category in categories %}
+              <li>
+                <a class="dropdown-item" href="#">{{category.category}}</a>
+              
+          
         
           <div class="dropdown-divider"></div>
           <li><a class="dropdown-item" href="#">By Author</a></li>

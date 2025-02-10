@@ -27,8 +27,10 @@
                             <!-- Post categories--> 
                              {% for category in categories %}
                                 {% if category.id == post.category_id %}
-                            <a class="badge bg-secondary text-decoration-none link-light" href="#!">Category: {{category.category}}</a>
+                            <a class="badge bg-secondary text-decoration-none link-light" href="{% url 'category' post.category %}">Category: {{category.category}}</a>
                             <a class="badge bg-secondary text-decoration-none link-light" href="{% url 'post' id=post.id %}">Details</a>
+                            <a class="badge bg-secondary text-decoration-none link-light">{{post.time}}</a>
+                            
                                 {% endif %}
                              {% endfor %}
                         </header>
