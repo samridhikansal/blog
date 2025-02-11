@@ -19,7 +19,6 @@ def index(request, page):
     posts = Post.objects.all().order_by("name")
     paginator = Paginator(posts, per_page=3)
     page_object =paginator.get_page(page)
-    categories = PostCategory.objects.all().values()
     users = User.objects.all().values()
     return render( request, "index.html", {"posts": posts,  "users": users, "page_obj":page_object})
 
@@ -47,7 +46,7 @@ def edit_post(request, id):
     post = Post.objects.get(id=id)
     author = post.author
     form = PostForm(instance=post)
-    categories = PostCategory.objects.all()
+    # categories = PostCategory.objects.all()
     if request.method == "POST":
 
         form=PostForm(request.POST or None, request.FILES or None)
@@ -65,7 +64,7 @@ def edit_post(request, id):
         # else:
              # messages.success(request, "you can not edit this post as you are not the author.")
             # return redirect('/posts/1')
-    return render(request, "edit_post.html", {"form": form, "categories": categories, "id": post.id})
+    return render(request, "edit_post.html", {"form": form, "id": post.id})
 
 #new comment logic. If the user is authenticated the author will be the authenticated user otherwise it will be automatically taken as guest.
 def comments(request, post_id):
