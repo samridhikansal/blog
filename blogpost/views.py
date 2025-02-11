@@ -20,7 +20,7 @@ def index(request, page):
     paginator = Paginator(posts, per_page=3)
     page_object =paginator.get_page(page)
     users = User.objects.all().values()
-    return render( request, "index.html", {"posts": posts,  "users": users, "page_obj":page_object})
+    return render( request, "index.html", { "users": users, "page_obj":page_object})
 
 #display posts sorted by categories
 

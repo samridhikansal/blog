@@ -21,7 +21,7 @@
                             <!-- Post meta content-->
                              {% for user in users %}
                                 {% if user.id == post.author_id %}
-                            <div class="text-muted fst-italic mb-2">Posted by {{user.username}}</div>
+                            <div class="text-muted fst-italic mb-2">Posted by {{user.username}} on {{post.time}}</div>
                                 {% endif %}
                             {% endfor %}
                             <!-- Post categories--> 
@@ -29,13 +29,13 @@
                                 {% if category.id == post.category_id %}
                             <a class="badge bg-secondary text-decoration-none link-light" href="{% url 'category' post.category %}">Category: {{category.category}}</a>
                             <a class="badge bg-secondary text-decoration-none link-light" href="{% url 'post' id=post.id %}">Details</a>
-                            <a class="badge bg-secondary text-decoration-none link-light">{{post.time}}</a>
+                          
                             
                                 {% endif %}
                              {% endfor %}
                         </header>
                         <!-- Preview image figure-->
-                        <figure class="mb-4"><img class="img-fluid rounded" src="{{ 'post.image' }}" alt={{post.image}} /></figure>
+                        <figure class="mb-4"><img class="img-fluid rounded" src="/{{post.image}}" alt={{post.image}} /></figure>
                         <!-- Post content-->
                     </article>
                     {% endfor %}
