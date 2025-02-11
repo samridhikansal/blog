@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from .forms import PostForm , CategoryForm, CommentsForm
+from .forms import PostForm , CategoryForm, CommentsForm, ReplyCommentForm
 from .models import PostCategory, Post, Comments
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger, Page
 from django.views.generic.list import ListView
@@ -38,8 +38,9 @@ def category(request, name):
 def post(request, id):
     post = Post.objects.get(id = id)
     form = CommentsForm()
+    reply_form = ReplyCommentForm()
     post_comments = Comments.objects.filter(post_id=id).values() 
-    return render(request, "post.html", {"post": post, "form": form, "comments": post_comments})
+    return render(request, "post.html", {"post": post, "form": form, "comments": post_comments, "reply_form": reply_form})
 
 #edit post 
 def edit_post(request, id):
@@ -70,6 +71,7 @@ def edit_post(request, id):
 def comments(request, post_id):
     post = Post.objects.get(pk=post_id)
     form = CommentsForm()
+    reply_form = ReplyCommentForm()
     post_comments = Comments.objects.filter(post_id=post_id).values() 
     if request.method =="POST":
         comment = CommentsForm(request.POST or None)
@@ -86,7 +88,7 @@ def comments(request, post_id):
             post_comments = Comments.objects.filter(post_id=post_id).values()
             messages.success(request, "Your comment was successfully added!!")
             return render(request, "post.html", { "post":post, "form": form, "comments":post_comments})
-    return render(request, "post.html", {"post": post, "form": form, "comments":post_comments })
+    return render(request, "post.html", {"post": post, "form": form, "comments":post_comments, "reply_form": reply_form })
 
 def edit_comments(request, comment_id):
     comment = Comments.objects.get(id=comment_id)
@@ -103,6 +105,34 @@ def edit_comments(request, comment_id):
             return redirect(url)
     
     return render(request, "edit_comments.html",{"form": form, "comment": comment})
+
+def  comments_reply(request, id, post_id):
+    post = Post.objects.get(id = post_id)
+    comment = Comments.objects.get(pk=id)
+    if request.method == "POST":
+       comment_reply = ReplyCommentForm(request.POST)
+       try:
+        if comment_reply.is_valid():
+            comment_reply.save(commit=False)
+            if request.user.is_authenticated:
+                comment_reply.author = User.objects.get(username = request.user.username)
+            else:
+                comment_reply.author = "Guest"
+            comment_reply.comment= comment
+            comment_reply.save()
+            messages.success(request, "Reply added sucessfully!")
+            return render(request ,'post.html',{"post": post } )
+       except Exception as e:
+         messages.error(request, e)
+         return render(request ,'post.html',{"post": post } )
+
+    else:
+       return render(request ,'post.html',{"post": post } )
+           
+           
+       
+
+    
 
 # view to help user see his profile that includes all activities that he has done on the website 
 def user_profile(request, username):

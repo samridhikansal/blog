@@ -1,4 +1,4 @@
-from .models import Post, PostCategory, Comments
+from .models import Post, PostCategory, Comments, Comments_reply
 from django import forms
 
 
@@ -17,3 +17,8 @@ class CommentsForm(forms.ModelForm):
     class Meta:
         model = Comments
         fields = ("comment",) 
+
+class ReplyCommentForm(forms.ModelForm):
+    class Meta:
+        model = Comments_reply
+        fields = ("reply",)
