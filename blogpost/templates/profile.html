@@ -4,42 +4,130 @@
 
 <div class="container mt-2">
     <!-- This section displays all the posts written by the user -->
-     {% for mesaage in messages%}
-     <div class={{message.tag}}>{{message}}</div>
-     {%endfor%}
-    <section class="mt-2">
-        {%if user.post%}
-        <div>I am here</div>
-        {%endif%}
+    <section class="alert">
+      {% for mesaage in messages%}
+      <div class={{message.tag}}>{{message}}</div>
+      {%endfor%}
+    </section>
+   <!-- section for the basic intro of the author -->
+     <section class="w-100 px-4 py-5" style="background-color: #9de2ff; border-radius: .5rem .5rem 0 0;">
+            <div class="row d-flex justify-content-center">
+              <div class="col col-md-9 col-lg-7 col-xl-6">
+                <div class="card" style="border-radius: 15px;">
+                  <div class="card-body p-4">
+                    <div class="d-flex">
+                      {% if author.image %}
+                      <div class="flex-shrink-0">
+                        <img src="/{{author.image}}"
+                          alt="Generic placeholder image" class="img-fluid" style="width: 180px; border-radius: 10px;">
+                      </div>
+                      {% endif %}
+                      <div class="flex-grow-1 ms-3">
+                        <h5 class="mb-1">{{user.username}}</h5>
+                        
+                        <div class="d-flex justify-content-between rounded-3 p-2 mb-2 bg-body-tertiary">
+                          <div>
+                            <p class="small text-muted mb-1">Articles</p>
+                            <p class="mb-0">{{author.total_posts}}</p>
+                          </div>
+                          <div class="px-3">
+                            <p class="small text-muted mb-1">Followers</p>
+                            <p class="mb-0">{{author.total_followers}}</p>
+                          </div>
+                          
+                          <div class="px-3">
+                            <p class="small text-muted mb-1">Follows</p>   
+                            <p class="mb-0">{{author.total_follows}}</p>
+                          </div>
+                          <div class="px-3">
+                            <p class="small text-muted mb-1">Category</p>
+                            <p class="mb-0">{{author.category}}</p>
+                          </div>
+                        </div> 
+                        <div class="d-none pt-1">
+                          <button  type="button" data-mdb-button-init data-mdb-ripple-init class="btn btn-primary me-1 flex-grow-1">Contact</button>
+                          <button  type="button" data-mdb-button-init data-mdb-ripple-init class="btn btn-primary flex-grow-1">Follow</button>
+                        </div>
+                       
+                        
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>      
+     </section>
+     <!-- Intro section ends here -->
+
+     <section class="mt-5">
+        <button onclick="show()">Add details </button>
+        <button onclick="show_edit()">Edit details</button>
+        <form id="add_details" style="display: none;">
+            <button>Add details </button>
+        </form>
+        <form id="edit_details" style="display: none;">
+            <button>Edit details </button>
+        </form>
+    </section>
+
+    <!-- All the posts by the author -->
+    <section class="mt-5">
+        
         {% if posts %}
-             <h2> You have posts the following on the portal</h2>
-            {% for post in posts%}
-            <p>{{post.name}}</p>
-            
-            <button><a href=" {% url 'edit_post' id=post.id %}" >Edit</a></button>
-            <button>Delete</button>
+             <h2 > List of all your posts. Click to view </h2>
+             
+             {% for post in posts%}
+             <div  class="mt-3">
+                <h3>{{post.name}}</h3>
+                <div>
+                  <a href=" {% url 'edit_post' id=post.id %}" >Edit</a>
+                  <a>Delete</a>
+                </div>
+              </div>
+              <div><hr></div>
             {%endfor%}
+             
         {% else %}
             <h2>No Posts to show</h2>
-            {{post}}
-            {{comment}}
         {% endif %}
     </section>
+    <!-- All posts section ends here -->
     <!-- This section contains all the comments made by the user -->
-    <section>
+    <section class="mt-5">
         {% if comments %}
-        <h2> You have commented on the following posts </h2>
+        <h2> You have commented on the posts </h2>
             {% for comment in comments %}
                 <div>
                     <h3>{{comment.post}}</h3>
                     <p> {{comment.comment}}</p>
                     <div class="d-flex flex-row justify-content-center">
-                        <button class="btn btn-secondary mx-2"><a href="{% url 'edit_comments'  comment_id=comment.id%}"> Edit Comment</a></button>
+                        <button class="btn btn-secondary mx-2"><a href="{% url 'edit_comments' post_id=comment.post_id  comment_id=comment.id%}"> Edit Comment</a></button>
                         <button class="btn btn-secondary mx-2">Delete Comment</button>
                     </div>
+                    <div><hr></div>
                 </div>
             {% endfor %}
         {%endif%}
+    </section>
+    <section>
+        <h2>Here is the list of all your liked posts</h2>
+        <div>
+          {% for like_dislike_post in like_dislike_posts %}
+            {% if like_dislike_post.like %}
+                <br> {{like_dislike_post.post   }}<br>
+            {%endif%}
+            
+        {% endfor%}
+        </div>
+        
+        <h2>Here is the list of the posts that you disliked</h2>
+        {% for like_dislike_post in like_dislike_posts %}
+            {% if like_dislike_post.dislike %}
+                <br> {{like_dislike_post.post   }}<br>
+            {%endif%}
+            
+        {% endfor%}
+        
     </section>
 <div class="d-flex justify-content-between">
     <a href = "{% url 'add' %}">Add a new Post</a>
@@ -49,3 +137,14 @@
 </div>
 
 
+<script>
+    function show() {
+        var x = document.getElementById("add_details");
+        x.style.display="block";
+    }
+    function show_edit() {
+        var x = document.getElementById("edit_details");
+        x.style.display="block";
+    }
+     
+</script>

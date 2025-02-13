@@ -2,29 +2,52 @@
 
 {% block content %}
 <div class="container">
+  <!-- System messages section  -->
   {% if messages %}
     {% for message in messages %}
     <div class="alert alert-success mt-2" role="alert">{{message}}</div>
     {% endfor%}
   {% endif %}
-</div>
-<article class="post">
-    
-    <h2 class="post-title">{{ post.name }}</h2>
-    {% if post.subtitle %}
-    <h3 class="post-subtitle">{{ post.subtitle }}</h3>
-    
-    {% endif %}
-  </a>
-  <p >
-   {{post.desc}}
-  </p>
+<!-- Messages section ends  -->
 
-</article>
+<!-- Post section begins -->
+ <section class="container mb-5">
+    <article class="post">
+      <h2 class="post-title">{{ post.name }}</h2>
 
+      <p>{{post.desc}}</p>
+      <h5>Author: {{post.author}}</h3>
+    </article>
+</section>
+<!-- post section ends  -->
+ 
+<!-- Like dislike section begins -->
 <section class="container mb-5">
+  <div class="container d-flex flex-row justify-content-between">
+    {% if post_like_dislike.dislike %}
+    <a class="badge bg-secondary text-decoration-none link-light" href="{% url 'total_likes' id=post.id %}">Like</a>
     
-        <form class="w-60 d-flex flex-column justify-content-center mb-5 " method="post" enctype="multipart/form-data" action="{% url 'comments' post_id=post.id %}">
+    {% elif post_like_dislike.like %}
+    <a class="badge bg-secondary text-decoration-none link-light" href="{% url 'total_dislikes' id=post.id %}">Dislike</a>
+    {% else %}
+    <a class="badge bg-secondary text-decoration-none link-light" href="{% url 'total_likes' id=post.id %}">Like</a>
+    <a  class="badge bg-secondary text-decoration-none link-light" href="{% url 'total_likes' id=post.id %}">Dislike</a>
+    {% endif %}
+    <a  class="badge bg-secondary text-decoration-none link-light" href="{% url 'follow' id=post.id username=post.author  %}">Follow the Author</a>
+
+  </div>
+  <div>
+    <div>Total likes on this post: {{post.total_likes}}</div>
+    <div>Total Dislike on this post:{{post.total_dislikes}} </div>
+  </div>
+</section>
+<!-- Like diskike section ends -->
+
+<!-- Add comments section begins -->
+ {% if form %}
+<section class="container mb-5">
+
+   <form class="w-60 d-flex flex-column justify-content-center mb-5 " method="post" enctype="multipart/form-data" action="{% url 'comments' post_id=post.id %}">
 
              {% csrf_token%}
              {% for field in form %}
@@ -41,6 +64,8 @@
 
     
 </section>
+{% endif %}
+
   {% if comments %}
   <section class="container  pt-3 pb-3">
     <h2>Comments</h2>
@@ -63,6 +88,7 @@
     {% endfor %}
   </section>
   {% endif %}
+</div>
 {% endblock %}
 
 

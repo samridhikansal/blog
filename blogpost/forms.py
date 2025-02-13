@@ -1,4 +1,4 @@
-from .models import Post, PostCategory, Comments, Comments_reply
+from .models import Post, PostCategory, Comments, Comments_reply, Author
 from django import forms
 
 
@@ -22,3 +22,8 @@ class ReplyCommentForm(forms.ModelForm):
     class Meta:
         model = Comments_reply
         fields = ("reply",)
+
+class AuthorForm(forms.ModelForm):
+    class Meta:
+        model=Author
+        fields =("category", "image")

@@ -1,62 +1,82 @@
 {% extends 'base.html' %}
-
-  {% block content %}
- 
-  {% if messages %}
-    {% for message in messages %}
+{% block content %}
+ <div class="container">
+    {% if messages %}
+    <!-- section for the system messages and alerts -->
+    <section class="alerts">
+       {% for message in messages %}
         <div class="alert alert-success mt-2" role="alert">{{message}}</div>
-    {% endfor%}
-  {% endif %}
-    <div class="col-lg-11">
-                    <!-- Post content-->
-                    
-                     {% for post in page_obj %}
-                     
-                     <article>
-                        <!-- Post header-->
-                        <header class="mb-4">
-                           
-                            <!-- Post title-->
-                            <h1 class="fw-bolder mb-1">{{post.name}}</h1>
-                            <!-- Post meta content-->
-                             {% for user in users %}
-                                {% if user.id == post.author_id %}
-                            <div class="text-muted fst-italic mb-2">Posted by {{user.username}} on {{post.time}}</div>
-                                {% endif %}
-                            {% endfor %}
-                            <!-- Post categories--> 
-                             {% for category in categories %}
-                                {% if category.id == post.category_id %}
-                            <a class="badge bg-secondary text-decoration-none link-light" href="{% url 'category' post.category %}">Category: {{category.category}}</a>
-                            <a class="badge bg-secondary text-decoration-none link-light" href="{% url 'post' id=post.id %}">Details</a>
-                          
-                            
-                                {% endif %}
-                             {% endfor %}
-                        </header>
-                        <!-- Preview image figure-->
-                        <figure class="mb-4"><img class="img-fluid rounded" src="/{{post.image}}" alt={{post.image}} /></figure>
-                        <!-- Post content-->
-                    </article>
+       {% endfor%}
+    </section>
+    {% endif %}
+    <!-- Section for the system messages ends -->
+    
+    <!-- Section for all posts -->
+    <section class="posts">
+        <div class="col-lg-11">
+            <h1 class="text-primary">All Posts</h1>
+            <!-- Individual post starts -->
+            {% for post in page_obj %}
+             <article>
+                    <!-- Post title -->
+                    <h2 class="fw-bolder mb-1">{{post.name}}</h2>
+                    <!-- Post Author and Publishing date -->
+                    {% for user in users %}
+                        {% if user.id == post.author_id %}
+                    <div class="text-muted fst-italic mb-2">
+                        Posted by {{user.username}} on {{post.time}}
+                    </div>
+                        {% endif %}
                     {% endfor %}
+                    <!-- Post categories and details--> 
+                    {% for category in categories %}
+                        {% if category.id == post.category_id %}
+                    <div>
+                        <a class="badge bg-secondary text-decoration-none link-light" href="{% url 'category' post.category %}">Category: {{category.category}}</a>
+                        <a class="badge bg-secondary text-decoration-none link-light" href="{% url 'post' id=post.id %}">Details</a>
+                    </div>
+                        {% endif %}
+                    {% endfor %}
+                    <!-- Image -->
+                    <img class="img-thumbnail rounded" src="/{{post.image}}" alt={{post.image}} />
+              
+            </article>
+            {% endfor %}
+            <!-- Individual post Ends -->
+        </div>
+    </section>  
+    <!-- section for all posts ends here -->
+
+    <!-- Pagination section begins -->
+     <section>
+        {% block pagination %}
+        <div class=" d-flex flex-row justify-content-between mb-2">
+           <div>
+               {% for page_number in page_obj.paginator.page_range %}
+               <a href="{% url 'index' page_number %}" class="{% if page_number == page_obj.number %}current{% endif %} mx-1">
+                   {{page_number}}</a>
+                  {%endfor%}
+           </div>
+           <div> {{page_obj}} </div>
+        </div>
+          
+       {% endblock %}
+     </section>
+    <!-- Pagination section ends -->
+   
+    <!--Page control section  -->
+ <section>
+    <button  type="button" data-mdb-button-init data-mdb-ripple-init class="btn btn-danger btn-floating btn-lg" id="btn-back-to-top">
+        <i class="fas fa-arrow-up"></i>
+
+ </section>   
+<!-- Page control section ends -->
+
+    
+ </div>
+  
+                                 
                     
-                     {% block pagination %}
-                     <div class=" d-flex flex-row justify-content-between mb-2">
-                        <div>
-                            {% for page_number in page_obj.paginator.page_range %}
-                            <a href="{% url 'index' page_number %}" class="{% if page_number == page_obj.number %}current{% endif %} mx-1">
-                                {{page_number}}</a>
-                               {%endfor%}
-                        </div>
-                        <div> {{page_obj}} </div>
-                     </div>
-                       
-                    {% endblock %}
-                    
-                    
-                    
-                    
-                    
-    </div>          
+            
     {% endblock %}
                  

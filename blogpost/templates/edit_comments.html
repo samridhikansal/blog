@@ -1,6 +1,6 @@
 {{comment.post}}
 
-<form action="{% url 'edit_comments' comment_id=comment.id%}" method="post" enctype="multipart/form-data">
+<form action="{% url 'edit_comments' post_id=comment.post_id comment_id=comment.id%}" method="post" enctype="multipart/form-data">
     {%csrf_token%}
     {{form}}
     <button class="btn btn-secondary" type="submit">Edit Comment</button>
