@@ -1,0 +1,20 @@
+{%include 'navbar.html' %}
+<section class="py-5">
+	<div class="container">
+		<div class="row">
+			<div class="col-md-5">
+				<span class="text-muted">Our Story</span>
+				<h2 class="display-5 fw-bold">{{about.name}}</h2>
+                <img class="card-img-top" src="/{{about.image}}" alt="..." />
+			</div>
+			<div class="col-md-6 offset-md-1">
+                <div class="card-body">
+                    <p class="lead">{{about.company_intro}}</p>
+                    <span class="text-muted">{{about.owner}}</span>
+
+                </div>
+				
+			</div>
+		</div>
+	</div>
+</section>

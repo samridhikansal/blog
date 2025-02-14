@@ -17,6 +17,15 @@
 
       <p>{{post.desc}}</p>
       <h5>Author: {{post.author}}</h3>
+      <div>
+        <a  class="badge bg-secondary text-decoration-none link-light" 
+                 href="{% url 'follow' id=post.id username=post.author  %}">Follow the Author
+        </a>
+        <a class="badge bg-secondary text-decoration-none link-light"
+                href="{% url 'profile'  username=post.author  %}">View Author details
+        </a>
+
+      </div>
     </article>
 </section>
 <!-- post section ends  -->
@@ -24,16 +33,16 @@
 <!-- Like dislike section begins -->
 <section class="container mb-5">
   <div class="container d-flex flex-row justify-content-between">
-    {% if post_like_dislike.dislike %}
+    {% if dislike %}
     <a class="badge bg-secondary text-decoration-none link-light" href="{% url 'total_likes' id=post.id %}">Like</a>
     
-    {% elif post_like_dislike.like %}
+    {% elif like %}
     <a class="badge bg-secondary text-decoration-none link-light" href="{% url 'total_dislikes' id=post.id %}">Dislike</a>
-    {% else %}
+    {%endif%}
+    {% if not like or dislike %}
     <a class="badge bg-secondary text-decoration-none link-light" href="{% url 'total_likes' id=post.id %}">Like</a>
     <a  class="badge bg-secondary text-decoration-none link-light" href="{% url 'total_likes' id=post.id %}">Dislike</a>
-    {% endif %}
-    <a  class="badge bg-secondary text-decoration-none link-light" href="{% url 'follow' id=post.id username=post.author  %}">Follow the Author</a>
+    {%endif%}
 
   </div>
   <div>

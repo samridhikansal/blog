@@ -5,7 +5,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .forms import PostForm , CategoryForm, CommentsForm, ReplyCommentForm, AuthorForm
-from .models import PostCategory, Post, Comments,  Post_like_dislike, Author, Follow, Comments_reply
+from .models import PostCategory, Post, Comments,  Post_like_dislike, Author, Follow, Comments_reply, About
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger, Page
 from django.views.generic.list import ListView
 from django.core.exceptions import ObjectDoesNotExist
@@ -15,6 +15,16 @@ from django.core.exceptions import ObjectDoesNotExist
 # view for the home page 
 
 # posts on the index page with pagination. Only three posts will be displayed on each page 
+def home(request):
+    featured_post = Post.objects.all().order_by("-total_likes")[0]
+    popular_author = Author.objects.all().order_by("-total_followers")[0]
+    categories = PostCategory.objects.all().values()
+    return render(request, "home.html", {"featured_post":featured_post, "popular_author":popular_author, "categories":categories})
+
+def about(request):
+    about = About.objects.all().values()[0]
+    return render(request, "about.html", {"about":about})
+
 def index(request, page):
     posts = Post.objects.all().order_by("name")
     paginator = Paginator(posts, per_page=3)
@@ -44,13 +54,18 @@ def post(request,id):
         user=request.user
         try:
             post_like_dislike = Post_like_dislike.objects.get(author=user,post_id=id)
-            return render(request, "post.html", {"post": post, "form": form, "comments": post_comments, "reply_form": reply_form, "post_like_dislike":post_like_dislike})
+            like=post_like_dislike.like
+            dislike=post_like_dislike.dislike
+            return render(request, "post.html", {"post": post, "form": form,\
+                                                 "comments": post_comments, "reply_form": reply_form, \
+                                                "like":like, "dislike":dislike})
         except Post_like_dislike.DoesNotExist:
+
             return render(request, "post.html", {"post": post, "form": form, "comments": post_comments, "reply_form": reply_form})
         
     except Post.DoesNotExist:
         messages.error(request, "No such post exist on the website")
-        return redirect('index',page=1)
+        return redirect('home')
 
 #total likes and dislikes on the post. on the authentic user can like or dislike a post.
 #if a user is not authentic, the view will send them to the login template 
@@ -62,26 +77,26 @@ def total_likes(request,id):
     if user.is_authenticated:
         try:
             post_like_dislike = Post_like_dislike.objects.get(author=user, post_id=id)
-            post_like_dislike.like = "True"
-            post_like_dislike.dislike="False"
+            if post_like_dislike.dislike==True:
+                post_like_dislike.dislike=False
+                post_like_dislike.like=True
+                post_like_dislike.save(update_fields=["like","dislike"])
+                post.total_likes = post.total_likes+1
+                post.total_dislikes=post.total_dislikes-1
+                post.save(update_fields=["total_likes", "total_dislikes"])
+            messages.success(request, "Thanks for Changing your Likings")
+            return redirect( "post", id=id)
+        except Post_like_dislike.DoesNotExist:
+            post_like_dislike=Post_like_dislike()
+            post_like_dislike.post = post
+            post_like_dislike.dislike=False
+            post_like_dislike.like=True
+            post_like_dislike.author=request.user
             post_like_dislike.save()
             post.total_likes = post.total_likes+1
-            post.total_dislikes=post.total_dislikes-1
-            post.save()
-            messages.success(request, "Thanks for changing the liking the comment")
-            return redirect( "post", post=post, post_like_dislike=post_like_dislike)
-        except Post_like_dislike.DoesNotExist:
-            post.total_likes= post.total_likes+1
-            post.save()
-            post_like_dislike=Post_like_dislike()
-            post_like_dislike.post =post
-            post_like_dislike.author=user
-            post_like_dislike.like="True"
-            post_like_dislike.dislike="False"
-            post_like_dislike.save()
-            total_likes = post.total_likes
+            post.save(update_fields=["total_likes"])
             messages.success(request, "Thanks for liking the comment")
-            return redirect("post", post=post, post_like_dislike=post_like_dislike)
+            return redirect("post", id=id)
     return redirect("post", post=post)
       
        
@@ -93,26 +108,26 @@ def total_dislikes(request,id):
     if user.is_authenticated:
          try:
             post_like_dislike = Post_like_dislike.objects.get(author=user, post_id=id)
-            post_like_dislike.dislike = "True"
-            post_like_dislike.like="False"
-            post_like_dislike.save()
+            if post_like_dislike.like == True:
+                post_like_dislike.like="False"
+                post_like_dislike.dislike="True"
+                post_like_dislike.save(update_fields=["like", "dislike"])
             post.total_dislikes = post.total_dislikes+1
             post.total_likes=post.total_likes-1
-            post.save()
-            messages.success(request, "Thanks for changing the dislike to like for the comment")
-            return redirect( "post", post = post, post_like_dislike = post_like_dislike)
+            post.save(update_fields=["total_likes", "total_dislikes"])
+            messages.success(request, "You disliked this post now. Thanks for sharing the feedback")
+            return redirect( "post", id=id)
          except Post_like_dislike.DoesNotExist:
             post.total_dislikes= post.total_dislikes+1
-            post.save()
+            post.save(update_fields=["total_dislikes"])
             post_like_dislike=Post_like_dislike()
             post_like_dislike.post=post
             post_like_dislike.author=user
             post_like_dislike.dislike="True"
             post_like_dislike.like="False"
             post_like_dislike.save()
-            total_likes = post.total_likes
-            messages.success(request, "Thanks for liking the comment")
-            return redirect("post", post = post, total_likes = total_likes, post_like_dislike = post_like_dislike)
+            messages.success(request, " You disliked this post.Thanks for the feedback")
+            return redirect("post", id=id)
     else:
         messages.error(request, "Please Login/register to like or dislike a comment")
         return render(request, "login.html")
@@ -239,17 +254,31 @@ def user_profile(request, username):
             author_user = Author.objects.get(user=profile_owner)
             like_dislike_posts = Post_like_dislike.objects.filter(author=profile_owner.username)
            
-            return render(request, 'profile.html', { "posts": posts,\
+            try:
+                profile_requester =User.objects.get(username = user)
+                if profile_owner==profile_requester:
+                    author_form = AuthorForm()
+                    return render(request, 'profile.html', {"owner":profile_owner,"posts": posts,\
                                                      "comments": comments, \
                                                      "like_dislike_posts":like_dislike_posts, \
                                                      "followers":followers, \
                                                       "follows":follows, \
+                                                      "author":author_user, "author_form":author_form  })
+                else:
+                    messages.success(request,"you are not the profile owner")
+                    return render(request, 'profile.html', { "owner":profile_owner,"posts": posts,\
+                                                     "like_dislike_posts":like_dislike_posts, \
+                                                     "followers":followers, \
+                                                      "follows":follows, \
                                                       "author":author_user })
+            except User.DoesNotExist:
+                messages.error(request, "You are not the registered user.")
+                return redirect("register")
          else:
           messages.success(request, "You are not logged in. Loggin to view the profile")
           return render(request, "login.html")
     except User.DoesNotExist:
-        messages.error(request, "No such user exist. Please register to create a profile")
+        messages.error(request, "You are not the registed user. Please register to create a profile")
         return redirect("register")
     
 def follow(request, username,id):
@@ -287,7 +316,7 @@ def login_user(request):
         if user is not None:
             login( request, user)
             messages.success(request, "You are logged in now")
-            return redirect("index", page=1)
+            return redirect("home")
         else:
             return render( request, "login.html", {"error": "there is an error"})
     return render( request, "login.html")
@@ -296,7 +325,7 @@ def login_user(request):
 def logout_user(request):
     logout(request)
     messages.success(request,"You have successfully loged out")
-    return render( request, "index.html")
+    return redirect("home")
 
 #register a user. 
 # If there is any form validation error the template will show an error message. 
@@ -318,7 +347,7 @@ def register_user(request):
                 author.save()
                 login(request,user)
                 messages.success(request, "You have sucessfully register. You are logged in now. You can press logout if you dont wish to cont.")
-                return render( request, "index.html", {"user":user})
+                return redirect("home")
             except Exception as e :
                 messages.error(request, e)
                 errors = form.errors
@@ -331,9 +360,6 @@ def register_user(request):
 #add a post. Login is required to add a post 
 @login_required
 def add_post(request):
-    current_user = request.user.username
-    user = User.objects.get(username = current_user)
-
     form = PostForm()
     categories = PostCategory.objects.all().values()
     if request.method == "POST":
@@ -344,11 +370,7 @@ def add_post(request):
         cat = request.POST.get("category")
         mypost.category = PostCategory.objects.get(pk = cat)
         mypost.save() 
-        posts = Post.objects.filter(author=user.id)
-        comments = Comments.objects.filter(author=user.username)
+        post =Post.objects.get(id=mypost.id).id
         messages.success(request, "Your post has been successfully added!!")    
-        return render(request, "profile.html", {"user": user, "posts":posts, "comments":comments})
-   
-    
-
+        return redirect( "post", id=post) 
     return render(request, "add.html", {"form": form, "categories": categories})

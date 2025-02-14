@@ -3,13 +3,25 @@ from django.contrib.auth.models import User
 from datetime import datetime, date
 
 # Create your models here.
+class About(models.Model):
+    name=models.CharField(max_length=50)
+    owner= models.CharField(max_length=70)
+    company_intro= models.TextField(max_length=2000)
+    image = models.ImageField(upload_to="image/", blank=True, null=True, default="cow.jpg")
+    def __str__(self):
+        return self.name
+    
 class Author(models.Model):
     image = models.ImageField(upload_to="image/", blank=True, null=True, default="cow.jpg")
+    intro = models.TextField(max_length=500, default=" ", null=True, blank="True")
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     total_posts = models.IntegerField(default=0, null=True)
     total_followers= models.IntegerField(default=0 ,null=0, blank=True)
     total_follows= models.IntegerField(default=0, null=0, blank=True)
     category=models.CharField(max_length=20, default="reader")
+
+    def __str__(self):
+        return self.user.username
 
 class Follow(models.Model):
     author = models.ForeignKey(User, models.CASCADE)

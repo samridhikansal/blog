@@ -1,0 +1,92 @@
+{%include 'navbar.html'%}
+
+
+  
+        
+        <header class="py-5 bg-light border-bottom mb-4">
+            <div class="container">
+                <div class="text-center my-5">
+                    <h1 class="fw-bolder">Welcome to Blog Home!</h1>
+                    <p class="lead mb-0">A Perfect destination for your reading dose</p>
+                </div>
+            </div>
+        </header>
+        <!-- Page content-->
+         
+        <div class="container">
+            {% for message in messages %}
+         <div class="{{message.tag}}">{{message}}</div>
+         {% endfor %}
+            <div class="d-flex flex-row justify-content-between">
+                <!-- Featured blog post-->
+                <div class="col-lg-8 m-3">
+                    <div class="card-header mb-4">
+                        <div class="d-flex flex-row justify-content-between">
+                            <h2 class="card-title m-2">Featured Post</h2>
+                            <span class="small text-muted m-2">Liked by: {{featured_post.total_likes}} people</span>
+                        </div>
+                        
+                        <a href="#!"><img class="card-img-top" src="/{{featured_post.image}}" alt="" /></a>
+                        <div class="card-body">
+                            <div class="small text-muted">{{featured_post.time}}</div>
+                            <h2 class="card-title">{{featured_post.name}}</h2>
+                            <p class="card-text">{{featured_post.desc}}</p>
+                            <a class="btn btn-primary" href="{% url 'post' id=featured_post.id%}">Read more →</a>
+                        </div>
+                    </div>
+                    </div>
+                    <!-- Side widget -->
+                    <div class="col-lg-4 m-3">
+                        <!-- Search widget-->
+                        <div class="card mb-4">
+                            <div class="card-header">Search</div>
+                            <div class="card-body">
+                                <div class="input-group">
+                                    <input class="form-control" type="text" placeholder="Enter search term..." aria-label="Enter search term..." aria-describedby="button-search" />
+                                    <button class="btn btn-primary" id="button-search" type="button">Go!</button>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Categories widget-->
+                        <div class="card mb-4">
+                            <div class="card-header">Posts Categories</div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <ul class="list-unstyled mb-0">
+                                            {% for category in categories%}
+                                            <li><a href="{% url 'category' name=category.category %}">{{category.category}}</a></li>
+                                            {% endfor %}
+                                    </div>
+                                    
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Side widget-->
+                        
+                        <div class="card mb-4">
+                            <div class=" card-header d-flex flex-row justify-content-between">
+                                Most Popular Author
+                                <span class="small text-muted ">Followed by: {{popular_author.total_followers}} people</span>
+                            </div>
+
+                            <a href="#!"><img class="card-img-top" src="/{{popular_author.image}}" alt="..." /></a>
+                            <div class="card-body">
+                                <div class="small text-muted">Total posts: {{popular_author.total_posts}}</div>
+                                <h2 class="card-title h4">{{popular_author.user.username}} </h2>
+                                <p class="card-text">{{popular_author.intro}}</p>
+                                <a class="btn btn-primary" href="#!">Follow →</a>
+                                <a>Read all Articles by {{popular_author.user.username}}</a>
+                            </div>
+                        </div>
+                <!-- Side widgets-->
+                </div>
+            </div>
+        </div>
+       
+        <!-- Footer-->
+        <footer class="py-5 bg-dark">
+            <div class="container"><p class="m-0 text-center text-white">Copyright &copy; Your Website 2023</p></div>
+        </footer>
+        
+   

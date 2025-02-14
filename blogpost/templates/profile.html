@@ -23,7 +23,7 @@
                       </div>
                       {% endif %}
                       <div class="flex-grow-1 ms-3">
-                        <h5 class="mb-1">{{user.username}}</h5>
+                        <h5 class="mb-1">{{owner.username}}</h5>
                         
                         <div class="d-flex justify-content-between rounded-3 p-2 mb-2 bg-body-tertiary">
                           <div>
@@ -44,11 +44,12 @@
                             <p class="mb-0">{{author.category}}</p>
                           </div>
                         </div> 
-                        <div class="d-none pt-1">
+                        {% if not author_form %}
+                        <div class="d-flex pt-1">
                           <button  type="button" data-mdb-button-init data-mdb-ripple-init class="btn btn-primary me-1 flex-grow-1">Contact</button>
                           <button  type="button" data-mdb-button-init data-mdb-ripple-init class="btn btn-primary flex-grow-1">Follow</button>
                         </div>
-                       
+                       {% endif %}
                         
                       </div>
                     </div>
@@ -59,30 +60,31 @@
      </section>
      <!-- Intro section ends here -->
 
+     {% if author_form%}     
      <section class="mt-5">
-        <button onclick="show()">Add details </button>
-        <button onclick="show_edit()">Edit details</button>
-        <form id="add_details" style="display: none;">
-            <button>Add details </button>
+       
+        <form id="add_details" class="d-flex">
+          {{author_form}}
+            <button>Add details/Edit details </button>
         </form>
-        <form id="edit_details" style="display: none;">
-            <button>Edit details </button>
-        </form>
-    </section>
-
-    <!-- All the posts by the author -->
-    <section class="mt-5">
+      
         
-        {% if posts %}
-             <h2 > List of all your posts. Click to view </h2>
+    </section>
+    {%endif%}
+    <!-- All the posts by the author -->
+    {% if posts %}
+    <section class="mt-5">
+        <h2 > List of all the posts.  </h2>
              
              {% for post in posts%}
              <div  class="mt-3">
                 <h3>{{post.name}}</h3>
+                {% if author_form %}
                 <div>
                   <a href=" {% url 'edit_post' id=post.id %}" >Edit</a>
                   <a>Delete</a>
                 </div>
+                {%endif%}
               </div>
               <div><hr></div>
             {%endfor%}
@@ -93,58 +95,50 @@
     </section>
     <!-- All posts section ends here -->
     <!-- This section contains all the comments made by the user -->
-    <section class="mt-5">
-        {% if comments %}
-        <h2> You have commented on the posts </h2>
-            {% for comment in comments %}
-                <div>
-                    <h3>{{comment.post}}</h3>
-                    <p> {{comment.comment}}</p>
-                    <div class="d-flex flex-row justify-content-center">
-                        <button class="btn btn-secondary mx-2"><a href="{% url 'edit_comments' post_id=comment.post_id  comment_id=comment.id%}"> Edit Comment</a></button>
-                        <button class="btn btn-secondary mx-2">Delete Comment</button>
-                    </div>
-                    <div><hr></div>
-                </div>
-            {% endfor %}
-        {%endif%}
-    </section>
-    <section>
-        <h2>Here is the list of all your liked posts</h2>
-        <div>
+    {% if author_form %}
+      {% if comments %}
+      <section class="mt-5">
+
+          <h2> You have commented on the posts </h2>
+              {% for comment in comments %}
+                  <div>
+                      <h3>{{comment.post}}</h3>
+                      <p> {{comment.comment}}</p>
+                      <div class="d-flex flex-row justify-content-center">
+                          <button class="btn btn-secondary mx-2"><a href="{% url 'edit_comments' post_id=comment.post_id  comment_id=comment.id%}"> Edit Comment</a></button>
+                          <button class="btn btn-secondary mx-2">Delete Comment</button>
+                      </div>
+                      <div><hr></div>
+                  </div>
+              {% endfor %}
+                
+      </section>
+      {%endif%}
+      {%endif%}
+      {% if author_form %}
+      <section>
+          <h2>Here is the list of all your liked posts</h2>
+          <div>
+            {% for like_dislike_post in like_dislike_posts %}
+              {% if like_dislike_post.like %}
+                  <br> {{like_dislike_post.post   }}<br>
+              {%endif%}
+
+          {% endfor%}
+          </div>
+
+          <h2>Here is the list of the posts that you disliked</h2>
           {% for like_dislike_post in like_dislike_posts %}
-            {% if like_dislike_post.like %}
-                <br> {{like_dislike_post.post   }}<br>
-            {%endif%}
-            
-        {% endfor%}
-        </div>
-        
-        <h2>Here is the list of the posts that you disliked</h2>
-        {% for like_dislike_post in like_dislike_posts %}
-            {% if like_dislike_post.dislike %}
-                <br> {{like_dislike_post.post   }}<br>
-            {%endif%}
-            
-        {% endfor%}
-        
-    </section>
-<div class="d-flex justify-content-between">
-    <a href = "{% url 'add' %}">Add a new Post</a>
-    
-</div>
+              {% if like_dislike_post.dislike %}
+                  <br> {{like_dislike_post.post   }}<br>
+              {%endif%}
 
-</div>
+          {% endfor%}
+
+     </section>
+     {%%endif}
+{%endif%}
 
 
-<script>
-    function show() {
-        var x = document.getElementById("add_details");
-        x.style.display="block";
-    }
-    function show_edit() {
-        var x = document.getElementById("edit_details");
-        x.style.display="block";
-    }
-     
-</script>
+
+

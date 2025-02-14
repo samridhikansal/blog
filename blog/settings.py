@@ -68,6 +68,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'blogpost.context_processors.categories',
                 'blogpost.context_processors.all_forms',
+                
 
             ],
         },
