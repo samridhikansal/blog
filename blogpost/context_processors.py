@@ -11,5 +11,8 @@ def all_forms(request):
     reply_form = ReplyCommentForm()
     return {"comments_form": comments_form, "reply_form": reply_form}
 
-def page_obj(request):
-    return {page_obj:Page(request)}
+def page(request): 
+    return {"pag_obj":Page(request)}
+
+    
+    

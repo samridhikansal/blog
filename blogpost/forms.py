@@ -26,4 +26,4 @@ class ReplyCommentForm(forms.ModelForm):
 class AuthorForm(forms.ModelForm):
     class Meta:
         model=Author
-        fields =("category", "image")
+        fields =("category", "image", "intro")

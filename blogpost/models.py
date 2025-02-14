@@ -49,6 +49,10 @@ class Post(models.Model):
     def __str__(self):
         return self.name
     
+class PostImages(models.Model):
+    post_image=models.ImageField(upload_to="image/", default="cow.jpg", blank=True)
+    post=models.ForeignKey(Post, on_delete=models.CASCADE)
+    
 class Post_like_dislike(models.Model):
     like = models.BooleanField(default=False)
     dislike= models.BooleanField(default=False)

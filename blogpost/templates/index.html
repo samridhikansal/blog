@@ -20,23 +20,15 @@
              <article>
                     <!-- Post title -->
                     <h2 class="fw-bolder mb-1">{{post.name}}</h2>
-                    <!-- Post Author and Publishing date -->
-                    {% for user in users %}
-                        {% if user.id == post.author_id %}
                     <div class="text-muted fst-italic mb-2">
-                        Posted by {{user.username}} on {{post.time}}
-                    </div>
-                        {% endif %}
-                    {% endfor %}
-                    <!-- Post categories and details--> 
-                    {% for category in categories %}
-                        {% if category.id == post.category_id %}
+                        Posted by {{post.author}} on {{post.time}}
+                    </div> 
                     <div>
-                        <a class="badge bg-secondary text-decoration-none link-light" href="{% url 'category' post.category %}">Category: {{category.category}}</a>
+                        <a class="badge bg-secondary text-decoration-none link-light" href="{% url 'category' post.category %}">Category: {{post.category.category}}</a>
                         <a class="badge bg-secondary text-decoration-none link-light" href="{% url 'post' id=post.id %}">Details</a>
                     </div>
-                        {% endif %}
-                    {% endfor %}
+                    
+               
                     <!-- Image -->
                     <img class="img-thumbnail rounded" src="/{{post.image}}" alt={{post.image}} />
               
@@ -66,8 +58,8 @@
    
     <!--Page control section  -->
  <section>
-    <button  type="button" data-mdb-button-init data-mdb-ripple-init class="btn btn-danger btn-floating btn-lg" id="btn-back-to-top">
-        <i class="fas fa-arrow-up"></i>
+    <button  type="button" data-mdb-button-init data-mdb-ripple-init class="btn btn-danger btn-floating btn-lg m-2" id="btn-back-to-top">
+        <i class="fas fa-arrow-up"> Top</i>
 
  </section>   
 <!-- Page control section ends -->

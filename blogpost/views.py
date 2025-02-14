@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.forms.models import model_to_dict
 from .forms import PostForm , CategoryForm, CommentsForm, ReplyCommentForm, AuthorForm
 from .models import PostCategory, Post, Comments,  Post_like_dislike, Author, Follow, Comments_reply, About
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger, Page
@@ -29,8 +30,8 @@ def index(request, page):
     posts = Post.objects.all().order_by("name")
     paginator = Paginator(posts, per_page=3)
     page_object =paginator.get_page(page)
-    users = User.objects.all().values()
-    return render( request, "index.html", {"users": users, "page_obj":page_object})
+   
+    return render( request, "index.html", { "page_obj":page_object})
 
 #display posts sorted by categories
 
@@ -39,6 +40,7 @@ def category(request,name):
         category = PostCategory.objects.get(category = name)
         if category:
           posts = Post.objects.filter(category= category)
+          
           return render(request, "category.html", {"posts": posts, "category": category.category})
     except PostCategory.DoesNotExist:
         messages.error(request, "There is no such category in the system. Contact admin to add a new category")
@@ -95,7 +97,7 @@ def total_likes(request,id):
             post_like_dislike.save()
             post.total_likes = post.total_likes+1
             post.save(update_fields=["total_likes"])
-            messages.success(request, "Thanks for liking the comment")
+            messages.success(request, "Thanks for liking the post")
             return redirect("post", id=id)
     return redirect("post", post=post)
       
@@ -223,7 +225,10 @@ def user_profile(request, username):
          user = request.user
          if user.is_authenticated:
             profile_owner = User.objects.get(username=username)
-            posts = Post.objects.filter(author=profile_owner.id)
+            posts = Post.objects.filter(author=profile_owner.id)  
+            paginator = Paginator(posts, per_page=3)
+            page=posts.count()/3
+            page_object =paginator.get_page(page)
             followers = Follow.objects.filter(author=profile_owner.id)
             comments = Comments.objects.filter(author=profile_owner.username)
             no_of_followers = followers.count()
@@ -259,7 +264,7 @@ def user_profile(request, username):
                 if profile_owner==profile_requester:
                     author_form = AuthorForm()
                     return render(request, 'profile.html', {"owner":profile_owner,"posts": posts,\
-                                                     "comments": comments, \
+                                                     "comments": comments, "page_object":page_object, \
                                                      "like_dislike_posts":like_dislike_posts, \
                                                      "followers":followers, \
                                                       "follows":follows, \
