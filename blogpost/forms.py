@@ -1,4 +1,4 @@
-from .models import Post, PostCategory, Comments, Comments_reply, Author
+from .models import Post, PostCategory, Comments, Comments_reply, Author, PostImages
 from django import forms
 
 
@@ -27,3 +27,8 @@ class AuthorForm(forms.ModelForm):
     class Meta:
         model=Author
         fields =("category", "image", "intro")
+
+class PostImageForm(forms.ModelForm):
+    class Meta:
+        model = PostImages
+        fields = ("post_image",)

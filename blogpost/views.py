@@ -5,8 +5,8 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.forms.models import model_to_dict
-from .forms import PostForm , CategoryForm, CommentsForm, ReplyCommentForm, AuthorForm
-from .models import PostCategory, Post, Comments,  Post_like_dislike, Author, Follow, Comments_reply, About
+from .forms import PostForm , CategoryForm, CommentsForm, ReplyCommentForm, AuthorForm, PostImageForm
+from .models import PostCategory, Post, Comments,  Post_like_dislike, Author, Follow, Comments_reply, About,PostImages
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger, Page
 from django.views.generic.list import ListView
 from django.core.exceptions import ObjectDoesNotExist
@@ -53,17 +53,18 @@ def post(request,id):
         form = CommentsForm()
         reply_form = ReplyCommentForm()
         post_comments = Comments.objects.filter(post_id=id).values() 
+        post_images = PostImages.objects.filter(post_id =id).values()
         user=request.user
         try:
             post_like_dislike = Post_like_dislike.objects.get(author=user,post_id=id)
             like=post_like_dislike.like
             dislike=post_like_dislike.dislike
-            return render(request, "post.html", {"post": post, "form": form,\
+            return render(request, "post.html", {"post": post, "form": form, "post_images":post_images,\
                                                  "comments": post_comments, "reply_form": reply_form, \
                                                 "like":like, "dislike":dislike})
         except Post_like_dislike.DoesNotExist:
 
-            return render(request, "post.html", {"post": post, "form": form, "comments": post_comments, "reply_form": reply_form})
+            return render(request, "post.html", {"post": post, "form": form, "comments": post_comments, "reply_form": reply_form, "post_images":post_images})
         
     except Post.DoesNotExist:
         messages.error(request, "No such post exist on the website")
@@ -141,6 +142,7 @@ def edit_post(request, id):
     post = Post.objects.get(id=id)
     author = post.author
     form = PostForm(instance=post)
+   
     # categories = PostCategory.objects.all()
     if request.method == "POST":
 
@@ -368,14 +370,29 @@ def add_post(request):
     form = PostForm()
     categories = PostCategory.objects.all().values()
     if request.method == "POST":
-      form = PostForm(request.POST or None, request.FILES or None) 
-      if form.is_valid():
-        mypost = form.save(commit=False)
-        mypost.author = User.objects.get(username = request.user)
-        cat = request.POST.get("category")
-        mypost.category = PostCategory.objects.get(pk = cat)
-        mypost.save() 
-        post =Post.objects.get(id=mypost.id).id
+        post = Post()
+        post.name = request.POST.get("name")
+        post.desc = request.POST["desc"]
+        post.image = request.FILES["image"]
+        post.author= User.objects.get(username=request.user) 
+        cat= request.POST["category"]
+        post.category = PostCategory.objects.get(pk = cat)
+        post.save() 
+        
+        id=post.id
+        images = request.FILES.getlist("post_images")
+        # post= Post.objects.get(id=id)
+        for image in images:
+            post_image = PostImages()
+            post_image.post_image= image
+            post_image.post = post
+            post_image.save()
+        user = User.objects.get(username = request.user)
+        author =Author.objects.get(user=user)    
+        author.total_posts +=1
+        
         messages.success(request, "Your post has been successfully added!!")    
-        return redirect( "post", id=post) 
+        return redirect( "post", id=id) 
+      
+
     return render(request, "add.html", {"form": form, "categories": categories})

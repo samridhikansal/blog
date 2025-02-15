@@ -14,12 +14,12 @@
     <!-- Section for all posts -->
     <section class="posts">
         <div class="col-lg-11">
-            <h1 class="text-primary">All Posts</h1>
+            <h1 class="text-primary card-header text-center">All Posts</h1>
             <!-- Individual post starts -->
             {% for post in page_obj %}
-             <article>
+             <article class="col-7 row justify-content-center">
                     <!-- Post title -->
-                    <h2 class="fw-bolder mb-1">{{post.name}}</h2>
+                    <h2 class="fw-bolder mb-1 card-body">{{post.name}}</h2>
                     <div class="text-muted fst-italic mb-2">
                         Posted by {{post.author}} on {{post.time}}
                     </div> 
