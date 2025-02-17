@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
 from datetime import datetime, date
+from django.utils import timezone
+
 
 # Create your models here.
 class About(models.Model):
@@ -24,7 +26,7 @@ class Author(models.Model):
         return self.user.username
 
 class Follow(models.Model):
-    author = models.ForeignKey(User, models.CASCADE)
+    author = models.ForeignKey(User,on_delete= models.CASCADE, related_name="followers")
     follower = models.CharField(max_length=50)
     status= models.BooleanField(default=False)
     
@@ -41,17 +43,18 @@ class Post(models.Model):
     name = models.CharField(max_length=50)
     desc = models.TextField(max_length=500)
     image = models.ImageField(upload_to= "image/", blank=True , default= "cow.jpg")
-    author = models.ForeignKey(User, on_delete= models.CASCADE)
+    author = models.ForeignKey(User, on_delete= models.CASCADE, related_name ="posts")
     category = models.ForeignKey(PostCategory, on_delete=models.CASCADE, null=True, blank= True)
-    time = models.DateField(default=datetime.now(), null=True, blank=True)
+    time = models.DateField(default=timezone.now(), null=True, blank=True)
+    last_updated = models.TimeField(datetime.now(), null=True, blank=True)
     total_likes = models.IntegerField(default=0, null=True, blank=True)
     total_dislikes = models.IntegerField(default=0, null=True, blank = True)
     def __str__(self):
         return self.name
     
 class PostImages(models.Model):
-    post_image=models.ImageField(upload_to="image/", default="cow.jpg", blank=True)
-    post=models.ForeignKey(Post, on_delete=models.CASCADE)
+    post_image=models.ImageField(upload_to="image/", default="cow.jpg", blank=True )
+    post=models.ForeignKey(Post, on_delete=models.CASCADE, related_name= "post_images")
     
     def __str__(self):
         return self.post.name
@@ -67,8 +70,8 @@ class Post_like_dislike(models.Model):
 
 class Comments(models.Model):
     comment = models.TextField(max_length=100)
-    post= models.ForeignKey(Post, on_delete=models.CASCADE)
-    author = models.CharField(max_length=100, blank=True, null=True)
+    post= models.ForeignKey(Post, on_delete=models.CASCADE, related_name = "post_comments")
+    author = models.CharField(max_length=100, blank=True, null=True )
     def __str__(self):
         return self.comment
 

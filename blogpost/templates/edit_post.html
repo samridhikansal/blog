@@ -17,6 +17,12 @@
                 <div class="col-sm-10"> {{field}}</div>
             </div>
             {% endfor %}
+              {% for image in images%}
+              <input type="file" name="{{image.id}}" value="image.post_image">
+                {{image.post_image}}
+              {%endfor %}
+              {{image_form}}
+           
             <div class="mb-3 row form-group">
               <div class="col-sm-2 col-form-label">Category</div> 
                <select class="col-sm-10" class="form-select" aria-label="Default select example" name = "category">

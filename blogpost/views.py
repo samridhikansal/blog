@@ -142,8 +142,10 @@ def edit_post(request, id):
     post = Post.objects.get(id=id)
     author = post.author
     form = PostForm(instance=post)
-   
-    # categories = PostCategory.objects.all()
+    image_form = PostImageForm()
+    images =post.post_images.all()
+    
+    
     if request.method == "POST":
 
         form=PostForm(request.POST or None, request.FILES or None)
@@ -157,13 +159,11 @@ def edit_post(request, id):
               post.author = User.objects.get(username = author)
               post.save()
               messages.success(request, "The post has been edited sucessfully")
-              return render(request, "post.html", {"post":post})
-        # else:
-             # messages.success(request, "you can not edit this post as you are not the author.")
-            # return redirect('/posts/1')
-    return render(request, "edit_post.html", {"form": form, "id": post.id})
+              return redirect("post", id=id)
+    return render(request, "edit_post.html", {"form": form, "id": post.id, "images":images, "image_form":image_form})
 
-#new comment logic. If the user is authenticated the author will be the authenticated user otherwise it will be automatically taken as guest.
+#new comment logic. If the user is authenticated the author will be the authenticated user 
+# otherwise they will be automatically taken as guest.
 def comments(request, post_id):
     post = Post.objects.get(pk=post_id)
     if request.method =="POST":
@@ -227,12 +227,9 @@ def user_profile(request, username):
          user = request.user
          if user.is_authenticated:
             profile_owner = User.objects.get(username=username)
-            posts = Post.objects.filter(author=profile_owner.id)  
-            paginator = Paginator(posts, per_page=3)
-            page=posts.count()/3
-            page_object =paginator.get_page(page)
-            followers = Follow.objects.filter(author=profile_owner.id)
-            comments = Comments.objects.filter(author=profile_owner.username)
+            posts=profile_owner.posts.all()
+            followers = profile_owner.followers.all()
+            comments = Comments.objects.filter(author=profile_owner.username)   
             no_of_followers = followers.count()
             follows = Follow.objects.filter(follower=profile_owner.username)
             no_follows = follows.count( )
@@ -263,10 +260,11 @@ def user_profile(request, username):
            
             try:
                 profile_requester =User.objects.get(username = user)
+                
                 if profile_owner==profile_requester:
                     author_form = AuthorForm()
-                    return render(request, 'profile.html', {"owner":profile_owner,"posts": posts,\
-                                                     "comments": comments, "page_object":page_object, \
+                    return render(request, 'profile.html', {  "owner":profile_owner,"posts": posts,\
+                                                     "comments": comments, \
                                                      "like_dislike_posts":like_dislike_posts, \
                                                      "followers":followers, \
                                                       "follows":follows, \
